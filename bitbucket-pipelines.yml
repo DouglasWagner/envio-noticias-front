@@ -1,0 +1,23 @@
+image: node:20.11.1
+pipelines:
+  branches:
+    master:
+      - step:
+          name: Build
+          caches: 
+            - node
+          script:
+            - npm install
+            - npm run build
+          artifacts:
+            - dist/spa/**
+      - step:
+          name: Deploy
+          deployment: production
+          script:
+            - pipe: atlassian/scp-deploy:0.3.3
+              variables:
+                USER: $USER
+                SERVER: $SERVER
+                REMOTE_PATH: '/var/www/ticker.press/html'
+                LOCAL_PATH: 'dist/spa/**'
